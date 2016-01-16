@@ -1,18 +1,7 @@
 #!/usr/bin/python
 
 '''
-	Name:
-		jamp (just another music player)
 
-	Description:
-		a curses based music player for the OSX terminal.
-
-	Misc:
-		audio_types = ['.mp3', '.mp4', '.wav']
-		directory = os.walk(os.getcwd()).next()
-		children = directory[1]
-		files = directory[2]
-		directory = directory[0]
 '''
 
 import curses, traceback, time, subprocess, os, sys
@@ -50,11 +39,6 @@ def play(filename):
     sound.initWithContentsOfFile_byReference_(path_to_file, True)
     sound.play()
     playing = True
-
-def stop():
-	global sound, playing
-	sound.stop()
-	playing = False
 
 def pause():
     global sound, playing
@@ -145,7 +129,7 @@ def handle_key_press(key):
     y_prev, x_prev = y, x
 
     dir_len = len(directory) - 1
-    stats()
+    # stats()
 
     if key == DOWN and y <= content_height and y <= pad_height:
         y += 1
@@ -176,12 +160,10 @@ def handle_key_press(key):
         draw()
     elif key == 10:
         if directory[content_position] in contents:
-			clear_line(screen_height - 1, 1)
-			if playing:
-				stop()
-			play(directory[content_position])
-			currently_playing = "Playing: Artist - %s" % directory[content_position]
-			screen.addstr(screen_height - 1, 1, currently_playing, curses.A_BOLD)
+            clear_line(screen_height - 1, 1)
+            play(directory[content_position])
+            currently_playing = "Playing: Artist - %s" % directory[content_position]
+            screen.addstr(screen_height - 1, 1, currently_playing, curses.A_BOLD)
         elif directory[content_position][0:-1] in sub_directories:
             clear_line(screen_height - 2, 1)
             os.chdir(directory[content_position][0:-1])
@@ -232,10 +214,10 @@ def stats():
     screen.move(y, x)
     unit = screen_width / 6
     #screen.addstr(0, 0, ("[screen height: " + str(screen_height) + "]"))
-    screen.addstr(0, unit * 1, ("[playing: " + str(playing) + "]"))
-    screen.addstr(0, unit * 2, ("[song: " + directory[content_position] + "]"))
-    #screen.addstr(0, unit * 3, ("[content height: " + str(content_height) + "]"))
-    #screen.addstr(0, unit * 4, ("[content position: " + str(content_position) + "]"))
+    screen.addstr(0, unit * 1, ("[pad height: " + str(pad_height) + "]"))
+    screen.addstr(0, unit * 2, ("[y: " + str(y) + "]"))
+    screen.addstr(0, unit * 3, ("[content height: " + str(content_height) + "]"))
+    screen.addstr(0, unit * 4, ("[content position: " + str(content_position) + "]"))
     #screen.addstr(0, 62, ("[dir length: " + str(len(directory)) + "]"))
 
 
