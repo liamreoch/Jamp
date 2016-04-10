@@ -18,11 +18,11 @@
 import curses, traceback, time, subprocess, os, sys
 from AppKit import NSSound
 
-sound = NSSound.alloc()
-
 UP = curses.KEY_UP
 DOWN = curses.KEY_DOWN
 RESIZE = curses.KEY_RESIZE
+
+sound = None
 
 y, x = 2, 1
 screen_height = 0
@@ -45,11 +45,12 @@ home = subprocess.check_output('echo ~', shell=True).strip('\n')
 os.chdir(home + '/Music/iTunes/iTunes Media/Music')
 
 def play(filename):
-    global sound, playing
-    path_to_file = os.getcwd() + '/' + filename
-    sound.initWithContentsOfFile_byReference_(path_to_file, True)
-    sound.play()
-    playing = True
+	global sound, playing
+	sound = NSSound.alloc();
+	path_to_file = os.getcwd() + '/' + filename
+	sound.initWithContentsOfFile_byReference_(path_to_file, True)
+	sound.play()
+	playing = True
 
 def stop():
 	global sound, playing
@@ -108,29 +109,30 @@ def draw():
     down_ctr = 0
 
     try:
-        screen.addstr(0, 1, 'jamp 0.1b', curses.A_BOLD)
-        screen.addstr(1, 1, ('-' * (screen_width - 2)))
-        screen.addstr(screen_height - 1, 1, currently_playing, curses.A_BOLD)
-        #screen.addstr(screen_height - 2, 1, 'user action', curses.A_BOLD)
-        screen.addstr(screen_height - 3, 1, ('-' * (screen_width - 2)))
+		screen.addstr(0, 1, 'jamp 0.1b', curses.A_BOLD)
+		screen.addstr(1, 1, ('-' * (screen_width - 2)))
+		#screen.addstr(screen_height - 2, 1, "Changed directory to %s" % directory[content_position])
+		screen.addstr(screen_height - 1, 1, currently_playing, curses.A_BOLD)
+		#screen.addstr(screen_height - 2, 1, 'user action', curses.A_BOLD)
+		screen.addstr(screen_height - 3, 1, ('-' * (screen_width - 2)))
 
-        sub_directories.insert(0, '..')
+		sub_directories.insert(0, '..')
 
-        for subdir in sub_directories:
-            directory.append(subdir + '/')
+		for subdir in sub_directories:
+		    directory.append(subdir + '/')
 
-        for filename in contents:
-            if filename[-4:] in audio_types:
-                directory.append(filename)
+		for filename in contents:
+		    if filename[-4:] in audio_types:
+		        directory.append(filename)
 
-        for item in directory[content_position:pad_height - 1]:
-            pad.addstr(down_ctr, 0, item)
-            down_ctr += 1
-            content_height += 1
+		for item in directory[content_position:pad_height - 1]:
+		    pad.addstr(down_ctr, 0, item)
+		    down_ctr += 1
+		    content_height += 1
 
-        screen.refresh()
-        refresh_pad()
-        screen.move(2, 1)
+		screen.refresh()
+		refresh_pad()
+		screen.move(2, 1)
     except:
         traceback.print_exc()
 
@@ -174,7 +176,7 @@ def handle_key_press(key):
         sub_directories.remove('..')
         y, x = 2, 1
         draw()
-    elif key == 10:
+    elif key == 10: #RETURN
         if directory[content_position] in contents:
 			clear_line(screen_height - 1, 1)
 			if playing:
@@ -208,11 +210,11 @@ def scroll_up():
     refresh_pad()
 
 def scroll_down():
-    global pad, content_position, pad_height, directory
-    pad.scroll(1)
-    content_position += 1
-    pad.addstr(pad_height - 2, 0, directory[content_position])
-    refresh_pad()
+	global pad, content_position, pad_height, directory
+	pad.scroll(1)
+	content_position += 1
+	pad.addstr(pad_height - 2, 0, directory[content_position])
+	refresh_pad()
 
 def reset_counters():
     global content_position, content_height, pad_position, down_ctr
@@ -227,17 +229,16 @@ def clear_line(x_line, y_line):
 	screen.move(y, x)
 
 def stats():
-    screen.move(0, 15)
-    screen.clrtoeol()
-    screen.move(y, x)
-    unit = screen_width / 6
-    #screen.addstr(0, 0, ("[screen height: " + str(screen_height) + "]"))
-    screen.addstr(0, unit * 1, ("[playing: " + str(playing) + "]"))
-    screen.addstr(0, unit * 2, ("[song: " + directory[content_position] + "]"))
-    #screen.addstr(0, unit * 3, ("[content height: " + str(content_height) + "]"))
-    #screen.addstr(0, unit * 4, ("[content position: " + str(content_position) + "]"))
-    #screen.addstr(0, 62, ("[dir length: " + str(len(directory)) + "]"))
-
+	screen.move(0, 15)
+	screen.clrtoeol()
+	screen.move(y, x)
+	unit = screen_width / 6
+	#screen.addstr(0, 0, ("[screen height: " + str(screen_height) + "]"))
+	#screen.addstr(0, unit * 1, ("[playing: " + str(playing) + "]"))
+	#screen.addstr(0, unit * 2, ("[song: " + directory[content_position] + "]"))
+	#screen.addstr(0, unit * 3, ("[content height: " + str(content_height) + "]"))
+	#screen.addstr(0, unit * 4, ("[content position: " + str(content_position) + "]"))
+	#screen.addstr(0, 62, ("[dir length: " + str(len(directory)) + "]"))
 
 if __name__=='__main__':
     try:
