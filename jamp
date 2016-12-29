@@ -21,10 +21,12 @@ from AppKit import NSSound
 UP = curses.KEY_UP
 DOWN = curses.KEY_DOWN
 RESIZE = curses.KEY_RESIZE
-PAGE_DOWN = 100
-PAGE_UP = 115
-QUIT = 113
-RETURN = 10
+PAGE_DOWN = 100 	# D
+PAGE_UP = 115 		# S
+QUIT = 113 			# Q
+JUMP = 106 			# J
+RETURN = 10 		# ENTER
+PAUSE = 32 			# SPACEBAR
 
 sound = None
 
@@ -161,6 +163,13 @@ def handle_key_press(key):
 		y = content_height + 1
 		pad_position = content_height + 1
 		content_position = content_height - 1
+	elif key == PAGE_UP and y >= content_height and y >= pad_height:
+		# y = content_height + 1
+		y = 2
+		# pad_position = content_height + 1
+		pad_position = 2
+		# content_position = content_height - 1
+		content_position = content_position - content_height + 1
 	elif key == DOWN and dir_len > pad_height and content_position < dir_len:
 		scroll_down()
 	elif key == UP and y > 2:
@@ -202,7 +211,7 @@ def handle_key_press(key):
 			reset_counters()
 			current_directory()
 			draw()
-	elif key == 32:
+	elif key == 32: # SPACEBAR
 		if playing:
 			pause()
 		else:
@@ -244,8 +253,8 @@ def stats():
 	#screen.addstr(0, 0, ("[screen height: " + str(screen_height) + "]"))
 	#screen.addstr(0, unit * 1, ("[playing: " + str(playing) + "]"))
 	#screen.addstr(0, unit * 2, ("[song: " + directory[content_position] + "]"))
-	#screen.addstr(0, unit * 3, ("[content height: " + str(content_height) + "]"))
-	#screen.addstr(0, unit * 4, ("[content position: " + str(content_position) + "]"))
+	screen.addstr(0, unit * 3, ("[pad position: " + str(pad_position) + "]"))
+	screen.addstr(0, unit * 4, ("[content position: " + str(content_position) + "]"))
 	#screen.addstr(0, 62, ("[dir length: " + str(len(directory)) + "]"))
 
 if __name__=='__main__':
